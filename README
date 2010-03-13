@@ -1,0 +1,3 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=3016
+
+Happy is a parser generator system for Haskell, similar to the tool `yacc' for C. This script is syntax file for happy files.
