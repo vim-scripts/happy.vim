@@ -1,9 +1,12 @@
 " Vim syntax file
 " Language:     Happy file language
 " Maintainer:   Nickolay Kudasov
-" Last Change:  13 March, 2010
+" Last Change:  18 March, 2010
 "
-" Version:      0.1
+" Version:      0.2
+" Changes:      ' is now part of non-terminals
+"               highlighting todos and fixmes in haskell comments
+"               highlighting haskell directives
 
 if exists("b:current_syntax")
     finish
@@ -12,13 +15,17 @@ endif
 " Keywords (e.g. %name) start with %, so we add it to keyword characters
 set iskeyword+=%
 
+" ' is allowed in non-terminals
+set isident+='
+
 " Haskell code in happy file
-syn match haskell_comment  /--.*$/ contained
+syn match haskell_comment  /--.*$/ contained contains=happy_todo,happy_fixme
 syn match haskell_char /'[^\\]'\|'\\.'/ contained
 
 syn region haskell_string           start=/"/ skip=/\\"/ end=/"/        contained
-syn region haskell_block_comment    start=/{-/ end=/-}/                 fold contained contains=haskell_block_comment
-syn region haskell_code             start=/{/ skip=/'\\\?}'/ end=/}/    fold contains=haskell_comment,haskell_block_comment,haskell_string,haskell_char,haskell_code
+syn region haskell_block_comment    start=/{-/ end=/-}/                 fold contained contains=haskell_block_comment,happy_todo,happy_fixme
+syn region haskell_directive        start=/{-#/ end=/#-}/               contained
+syn region haskell_code             start=/{/ skip=/'\\\?}'/ end=/}/    fold contains=haskell_comment,haskell_block_comment,haskell_string,haskell_char,haskell_code,haskell_directive
 
 " Comments in happy file
 syn match happy_comment  /--.*$/ contains=happy_todo,happy_fixme
@@ -46,17 +53,19 @@ syn region happy_assoc  matchgroup=happy_directives start=/%left/       end=/%/m
 syn region happy_assoc  matchgroup=happy_directives start=/%right/      end=/%/me=e-1,he=e-1 contains=token_name,haskell_code,happy_comment
 syn region happy_assoc  matchgroup=happy_directives start=/%nonassoc/   end=/%/me=e-1,he=e-1 contains=token_name,haskell_code,happy_comment
 
-" Happy grammar
-syn match non_terminal  /[a-zA-Z_][a-zA-Z_\d]*/         contained
-syn region terminal     start=/"/ skip=/\\"/ end=/"/    contained
-syn region terminal     start=/'/ skip=/\\'/ end=/'/    contained
+syn match happy_separator   /%%/
 
-syn region happy_grammar matchgroup=happy_separator start=/%%/ end=/here should be eof, but i don't know, how to represent eof in vim's regexp/ contains=happy_comment,happy_block_comment,haskell_code,non_terminal,terminal
+" Happy grammar
+syn match non_terminal  /[a-zA-Z_][a-zA-Z_\d\']*/         
+syn region terminal     start=/"/ skip=/\\"/ end=/"/    
+syn region terminal     start=/'/ skip=/\\'/ end=/'/    
 
 hi def link haskell_comment         Comment
 hi def link haskell_block_comment   Comment
+hi def link haskell_directive       Special
 hi def link haskell_char            Character
 hi def link haskell_string          String
+
 hi def link happy_comment           Comment
 hi def link happy_block_comment     Comment
 hi def link happy_todo              Todo
